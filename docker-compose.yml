@@ -1,0 +1,21 @@
+version: '3.9'
+services:
+  api:
+    build: .
+    env_file: .env.local
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: bundoro
+      POSTGRES_PASSWORD: bundoro
+      POSTGRES_DB: bundoro
+    ports:
+      - "5432:5432"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+volumes:
+  dbdata:
