@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String   @id @default(uuid())
+  email          String   @unique
+  walletAddress  String   @unique
+  authProvider   String
+  encryptedKey   String
+  createdAt      DateTime @default(now())
+
+  positions Position[]
+  orders    Order[]
+  ledger    Ledger[]
+}
+
+model Bundle {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  weightMode  String   @default("equal")
+  marketsJson Json
+  createdAt   DateTime @default(now())
+  createdBy   String?
+
+  orders Order[]
+}
+
+model Position {
+  id         String   @id @default(uuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  marketId   String
+  outcome    String
+  shares     Decimal  @db.Decimal(38,18)
+  avgPrice   Decimal  @db.Decimal(38,18)
+  createdAt  DateTime @default(now())
+}
+
+model Order {
+  id                String   @id @default(uuid())
+  user              User     @relation(fields: [userId], references: [id])
+  userId            String
+  bundle            Bundle?  @relation(fields: [bundleId], references: [id])
+  bundleId          String?
+  polymarketHash    String   @unique
+  status            String
+  fillsJson         Json
+  createdAt         DateTime @default(now())
+}
+
+model Ledger {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  txType    String
+  amountUSDC Decimal  @db.Decimal(38,18)
+  ref       String?
+  timestamp DateTime @default(now())
+}
+
