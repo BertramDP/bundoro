@@ -13,6 +13,7 @@ model User {
   walletAddress  String   @unique
   authProvider   String
   encryptedKey   String
+  passwordHash   String?  // only for local-auth users
   createdAt      DateTime @default(now())
 
   positions Position[]
